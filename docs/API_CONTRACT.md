@@ -10,6 +10,9 @@ Status codes: 200 ok, 400 bad input, 404 not found, 422 validation error, 502 AI
 | GET | /api/health | none | {"status": "ok"} |
 | POST | /api/echo | {"message": string} | {"message": string, "length": number} |
 | POST | /api/ai/ask | {"prompt": string} | {"answer": string} |
+| GET | /api/notes | none | [{"id": number, "text": string}] |
+| POST | /api/notes | {"text": string} | 201 {"id": number, "text": string} |
+| DELETE | /api/notes/{id} | none | 204 no body (404 {"detail": "Note not found"} if missing) |
 
 ## Adding an endpoint (copy this block)
 - Method and path:
