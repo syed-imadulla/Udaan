@@ -45,12 +45,29 @@ and fill it in. Never commit `.env`.
    `for module in (health, echo, ai, notes, <name>):`. Every router gets the `/api` prefix.
 3. Add the endpoint to `docs/API_CONTRACT.md` in the same change.
 
-## How to switch to Postgres
-1. Add `psycopg[binary]` to `dependencies` in `pyproject.toml` (ask the team first), then run `uv sync`.
-2. Change only `DATABASE_URL` in `.env`, for example
-   `postgresql+psycopg://user:password@localhost:5432/udaan`.
+## Database
+SQLite by default: the file `backend/app.db` is created on first start and is git-ignored.
 
-No code changes are needed. `app/db.py` only adds the SQLite-specific option when the URL starts with `sqlite`.
+**Seed demo data**
+```bash
+cd backend
+uv run python -m app.seed
+```
+It prints `seeded` the first time and `already seeded` after that. Edit `app/seed.py` to add your own demo data.
+
+**Add a table**
+1. In `app/models.py`, copy the `Note` model, rename it and add your fields.
+2. Delete `backend/app.db`. There are no migrations, so existing tables are not altered.
+3. Restart the server. The new table is created on startup.
+
+**Switch to Postgres**
+1. `uv add "psycopg[binary]"` (ask the team first: it adds a dependency).
+2. Set `DATABASE_URL` in `.env` to the Supabase or Render connection string.
+   `postgres://` and `postgresql://` URLs are converted to the psycopg driver automatically.
+3. Restart the server.
+
+**Warning:** on Render's free tier the disk is wiped on every deploy and restart,
+so SQLite data is lost. Use Postgres for anything you need to keep.
 
 ## How the AI package connects
 `app/routes/ai.py` imports `ai_engine.llm.ask_llm` inside the request handler,
